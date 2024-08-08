@@ -39,3 +39,11 @@ body {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
+.hidden {
+  display: none;
+}
+
+.show {
+  display: block;
+}
