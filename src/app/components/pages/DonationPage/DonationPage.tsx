@@ -1,111 +1,126 @@
-'use client'
+// DonationPage.tsx
 
-import React, { useEffect, useMemo, useReducer } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
-import { toast, ToastContainer } from 'react-toastify'
+'use client';
 
-import { FormInputsProps, TransactionProps, DonationFormProps } from '@/types/types'
+import React, { useEffect, useMemo, useReducer } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import { toast, ToastContainer } from 'react-toastify';
 
-import Select from '../../Select'
-import Button from '../../Button'
-import TransactionHistoryTable from '../../Table/Table'
+import { FormInputsProps, TransactionProps, DonationFormProps } from '@/types/types';
 
-import { cancerList, centersList, donationAmountsList } from '@/mockData'
+import Select from '../../Select/Select';
+import Button from '../../Button/Button';
+import TransactionHistoryTable from '../../Table/Table';
 
+import { cancerList, centersList, donationAmountsList } from '@/mockData';
 
 type State = {
     purseBalance: number;
     currentBalance: number;
     isProcessing: boolean;
     transactions: TransactionProps[];
-}
+};
 
 type Action =
     | { type: 'SUBMIT_DONATION'; payload: TransactionProps }
     | { type: 'SET_PROCESSING'; payload: boolean }
     | { type: 'INSUFFICIENT_FUNDS'; payload: boolean }
+    | { type: 'RESET_BALANCE' };
 
 const initialState: State = {
     purseBalance: 200,
     isProcessing: false,
     transactions: [],
-    currentBalance: 0,
+    currentBalance: 200,
 };
 
-function reducer(state: State, action: Action): State
-{
-    switch (action.type)
-    {
+let date = new Date().getFullYear();
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
         case 'SUBMIT_DONATION':
             return {
                 ...state,
                 purseBalance: state.purseBalance - action.payload.amount,
                 transactions: [action.payload, ...state.transactions],
-            }
+            };
         case 'SET_PROCESSING':
             return {
                 ...state,
                 isProcessing: action.payload,
-            }
+            };
         case 'INSUFFICIENT_FUNDS':
             return {
                 ...state,
                 currentBalance: state.purseBalance,
-            }
+            };
+        case 'RESET_BALANCE':
+            return {
+                ...state,
+                purseBalance: 200, // Reset balance
+            };
         default:
-            return state
+            return state;
     }
 }
 
-const DonationPage: React.FC<DonationFormProps> = ({ isProcessing }) =>
-{
-    const [state, dispatch] = useReducer(reducer, initialState)
-    // Use react-hook-form for form handling
-    const { register, handleSubmit, formState: { isSubmitting }, reset, watch } = useForm<FormInputsProps>()
+const DonationPage: React.FC<DonationFormProps> = ({ isProcessing }) => {
+    const [state, dispatch] = useReducer(reducer, initialState);
+    const { register, handleSubmit, formState: { isSubmitting }, reset, watch } = useForm<FormInputsProps>();
 
-    const [isButtonDisabled, setIsButtonDisabled] = React.useState(true)
-
+    const [isButtonDisabled, setIsButtonDisabled] = React.useState(false);
+ 
     const cancerData = useMemo(() => [...cancerList], [cancerList]);
     const centersData = useMemo(() => [...centersList], [centersList]);
     const donationAmountsData = useMemo(() => [...donationAmountsList], [donationAmountsList]);
 
-    const watchedFields = watch(['cancer', 'center', 'amount']); // Watch these fields
+    const watchedFields = watch(['cancer', 'center', 'amount']);
 
-    const onSubmit: SubmitHandler<FormInputsProps> = async (data) =>
-    {
-        const amount = parseInt(data.amount, 10)
+    const onSubmit: SubmitHandler<FormInputsProps> = async (data) => {
+        const amount = parseInt(data.amount, 10);
 
         const transaction: TransactionProps = {
             cancer: data.cancer,
             center: data.center,
             amount: amount,
             date: new Date().toISOString(),
-        }
+        };
 
-        if (amount > state.purseBalance)
-        {
+        if (amount > state.purseBalance) {
             toast.error(`Insufficient balance. You only have $${state.purseBalance} available.`);
-            dispatch({ type: 'INSUFFICIENT_FUNDS', payload: true })
-            return
+            dispatch({ type: 'INSUFFICIENT_FUNDS', payload: true });
+            return;
         }
 
-        dispatch({ type: 'SET_PROCESSING', payload: true })
+        dispatch({ type: 'SET_PROCESSING', payload: true });
 
         // Simulate processing
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        dispatch({ type: 'SUBMIT_DONATION', payload: transaction })
-        dispatch({ type: 'SET_PROCESSING', payload: false })
+        dispatch({ type: 'SUBMIT_DONATION', payload: transaction });
+      
+        dispatch({ type: 'SET_PROCESSING', payload: false });
 
-        toast.success(`Thanks for donating $${amount} to ${data.center} towards ${data.cancer}. Want to donate again?`)
-        reset()
-    }
+        toast.success(`Thanks for donating $${amount} to ${data.center} towards ${data.cancer} cancer. Want to donate again?`);
+        reset();
+    };
 
-    useEffect(() =>
-    {
+    useEffect(() => {
+
         // Enable button if all fields have values
         const allFieldsFilled = watchedFields.every(field => field !== undefined && field !== '');
         setIsButtonDisabled(!allFieldsFilled || state.purseBalance === 0);
+
+        if (state.purseBalance === 0) {
+            setIsButtonDisabled(true);
+            setTimeout(() => {
+                dispatch({ type: 'RESET_BALANCE' });
+                window.location.reload();
+            }, 5500);
+
+        } else {
+            setIsButtonDisabled(false);
+        }
     }, [watchedFields, state.purseBalance]);
 
     return (
@@ -123,7 +138,7 @@ const DonationPage: React.FC<DonationFormProps> = ({ isProcessing }) =>
                         <div className="p-3 bg-gray-50">
                             <div className="flex flex-col md:flex-row gap-6">
                                 <div className="flex-1">
-                                    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto bg-white rounded-2xl shadow-lg p-4 w-full max-h-100  text-indigo-500" data-testid="donation-form">
+                                    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto bg-white rounded-2xl shadow-lg p-4 w-full max-h-100 text-indigo-500" data-testid="donation-form">
                                         <h2 className="text-2xl font-bold text-center mb-4 text-black">Make a Donation</h2>
                                         <Select
                                             aria-label="select-cancer"
@@ -169,10 +184,12 @@ const DonationPage: React.FC<DonationFormProps> = ({ isProcessing }) =>
                         <ToastContainer position="top-right" />
                     </div>
                 </div>
-                <h5 className='text-center text-indigo-700 font-light'>@2024 Powered by Coriano Harris</h5>
+                <h5 className='text-center text-indigo-700 font-light'>
+            <span>&copy; {date}</span> Powered By Coriano Harris. All rights reserved.
+        </h5>
             </div>
         </>
-    )
-}
+    );
+};
 
 export default DonationPage;
