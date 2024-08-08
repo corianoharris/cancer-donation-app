@@ -7,9 +7,9 @@ export const cancerList = [
   ]
   
   export const centersList = [
-    { value: 'MD Anderson Cancer Center', label: 'MD Anderson Cancer Center' },
-    { value: 'Memorial Sloan Kettering Cancer Center', label: 'Memorial Sloan Kettering Cancer Center' },
-    { value: 'Mayo Clinic Cancer Center', label: 'Mayo Clinic Cancer Center' },
+    { value: 'MD Anderson Cancer', label: 'MD Anderson Cancer' },
+    { value: 'Memorial Sloan Kettering Cancer', label: 'Memorial Sloan Kettering Cancer' },
+    { value: 'Mayo Clinic Cancer', label: 'Mayo Clinic Cancer' },
     { value: 'Dana-Farber Cancer Institute', label: 'Dana-Farber Cancer Institute' },
   ]
   
