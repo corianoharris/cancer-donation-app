@@ -169,7 +169,7 @@ const DonationPage: React.FC<DonationFormProps> = ({ isProcessing }) =>
                         <ToastContainer position="top-right" />
                     </div>
                 </div>
-                <h5 className='text-center text-indigo-700 font-light'>Powered</h5>
+                <h5 className='text-center text-indigo-700 font-light'>Powered by Coriano Harris</h5>
             </div>
         </>
     )
