@@ -47,21 +47,21 @@ This is a Next.js application with TypeScript that allows users to make donation
 
 ## Components
 
-### Button Component (`components/Button.tsx`)
+### Button Component (`components/Button/Button.tsx`)
 
 A client-side button component that handles loading state and styling.
 
-### Select Component (`components/Select.tsx`)
+### Select Component (`components/Select/Select.tsx`)
 
 A server-side select component for reusable dropdown functionality.
 
-### Transaction History Table Component (`components/Table.tsx`)
+### Transaction History Table Component (`components/Table/Table.tsx`)
 
 A server-side table component for reusable table to display items in a row.
 
 A server-side select component for reusable dropdown functionality.
 
-### DonationPage (`app/animal-donation/page.tsx`)
+### DonationPage (`app/pages/DonationPage/DonationPage.tsx`)
 
 The main page component that integrates all features of the animal donation application.
 
